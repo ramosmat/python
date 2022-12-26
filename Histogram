@@ -1,0 +1,38 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+dataset = pd.read_csv('ds_salaries.csv', index_col = 0)
+dataset.loc[29,'job_title'] = 'Machine Learning Engineer'
+
+cargos = sorted(['Data Scientist','Data Engineer','Data Analyst','Machine Learning Engineer'])
+pais = sorted(['DE','CA','IN','US','GB'])
+ex_lvl = ['EN','MI','SE','EX'] #Junior, Intermediate, Expert, Director
+lvl_names = ['Junior','Intermediate','Expert','Director']
+anos = dataset['work_year'].unique()
+
+#Criando o subset
+l = dataset[np.logical_and(dataset['job_title'].isin(cargos),dataset['company_location'].isin(pais))]
+l = l.loc[:,['work_year','experience_level','job_title','salary_in_usd','company_location']]
+
+#Criando a figura
+plt.figure(figsize = (13,6))
+colors = ['#00FF52','#FF0000','#0400FF','#FFED00'] #verde, vermelho, azul e amarelo
+alpha = [1,0.7,0.387,0.7]
+
+#Criando histrograma
+for i in range(len(cargos)):
+    color = colors[i]
+    plt.hist(l.loc[l['job_title'] == cargos[i]]['salary_in_usd'], bins = 15, alpha = alpha[i], color = color)
+
+plt.grid(False)
+plt.title('Titulo', size = 35)
+plt.legend(cargos, fontsize = 20)
+
+#plt.xlabel('Salário em Dolar', size = 18)
+plt.xticks(size = 20, rotation = 45)
+
+#plt.ylabel('Quantidade', size = 18)
+plt.yticks(size = 20)
+
+plt.show()
