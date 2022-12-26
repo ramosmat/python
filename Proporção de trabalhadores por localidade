@@ -1,0 +1,22 @@
+import pandas as pd
+import numpy as np
+
+sal = pd.read_csv('ds_salaries.csv', index_col = 0)
+
+sal.loc[29,'job_title'] = 'Machine Learning Engineer' #Alterando o ML Manager por ML Engineer na celula especificada no .loc[]
+cargos = sorted(['Data Analyst', 'Data Scientist', 'Machine Learning Engineer', 'Data Engineer'])
+locais = sorted(['CA','DE','GB','IN','US'])
+anos = list(sal['work_year'].unique())
+
+#Selecionando apenas os cargos e locais de companhias desejadas
+s = sal[np.logical_and(sal['job_title'].isin(cargos),sal['company_location'].isin(locais))]
+
+#Filtrando apenas para a coluna de localização de colunas. Do groupby até o agg está faz contas para adicionar a coluna de
+ #quantidade. O rename está alterando o nome da coluna 'company_location' para count, pois é a coluna de quantidade criada.
+ #Isso é necessário para que depois o método reset_index() possa identificar a coluna correta.
+df_loc = s.loc[:,['company_location']].groupby(by='company_location').agg({'company_location':'count'}).rename(columns={'company_location': 'count'}).reset_index()
+
+#Criando coluna com proporção de cada localização e renomeando as colunas
+df_loc['proportion'] = np.around((df_loc['count'] / df_loc['count'].sum())*100, 2)
+df_loc = df_loc.rename(columns = {'company_location':'Company Location', 'count':'Quantidade', 'proportion':'Proporção (%)'})
+df_loc
